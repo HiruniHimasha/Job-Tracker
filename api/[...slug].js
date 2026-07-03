@@ -1,7 +1,4 @@
 // api/[...slug].js
-// Vercel routes every /api/* request into this single serverless function,
-// which hands it to your existing Express app unchanged.
-const serverless = require("serverless-http");
-const app = require("../job-tracker-backend/server");
-
-module.exports = serverless(app);
+// Vercel routes every /api/* request into this function. Vercel's Node.js
+// runtime can run an Express app directly — no extra wrapper package needed.
+module.exports = require("../job-tracker-backend/server");
