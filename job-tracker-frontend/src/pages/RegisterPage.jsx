@@ -69,7 +69,7 @@ function Stars({ count }) {
   );
 }
 
-// ── Review carousel ───────────────────────────────────────────────────────────
+// ── Review carousel (desktop hero panel only) ─────────────────────────────────
 function ReviewCarousel() {
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
@@ -209,9 +209,9 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950
-                    flex flex-col lg:flex-row overflow-hidden">
+                    flex flex-col lg:flex-row">
 
-      {/* ── LEFT HERO PANEL ────────────────────────────────────────────────── */}
+      {/* ── LEFT HERO PANEL (desktop only) ──────────────────────────────────── */}
       <div className="hidden lg:flex flex-col justify-between w-1/2 p-12 relative overflow-hidden">
 
         {/* Animated blobs */}
@@ -225,7 +225,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Grid background */}
-        <div className="absolute inset-0 opacity-[0.06]"
+        <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
           style={{
             backgroundImage: 'linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
@@ -284,143 +284,147 @@ export default function RegisterPage() {
       </div>
 
       {/* ── RIGHT REGISTER PANEL ───────────────────────────────────────────── */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative">
+      <div className="flex-1 flex flex-col">
 
-        {/* Mobile logo */}
-        <div className="absolute top-6 left-6 flex items-center gap-2 lg:hidden">
+        {/* Mobile header — normal document flow, never overlaps the card */}
+        <div className="flex lg:hidden items-center gap-2 px-5 pt-5 pb-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500
-                          flex items-center justify-center text-white font-bold text-sm">
+                          flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
             JT
           </div>
           <span className="text-white font-bold">Job Tracker</span>
         </div>
 
-        {/* Mobile review strip (visible only on small screens) */}
-        <div className="lg:hidden absolute top-16 left-0 right-0 px-4 pb-0 pt-2">
+        {/* Mobile testimonial strip — normal flow, sits above the card */}
+        <div className="lg:hidden px-4 pb-4">
           <MobileReviewStrip />
         </div>
 
-        <div className="w-full max-w-md mt-16 lg:mt-0">
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/50">
+        <div className="flex-1 flex items-start lg:items-center justify-center px-4 pb-8 sm:px-6 lg:p-12">
+          <div className="w-full max-w-md">
+            <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 sm:p-8 border border-white/50">
 
-            {/* Header */}
-            <div className="mb-7">
-              <h2 className="text-3xl font-extrabold text-gray-900 mb-1.5">Create account 🚀</h2>
-              <p className="text-gray-500 text-sm">Start tracking your job hunt today — it's free!</p>
-            </div>
-
-            {/* Error */}
-            {error && (
-              <div className="mb-5 flex items-start gap-3 bg-red-50 border border-red-200 rounded-2xl p-4">
-                <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-bold">!</span>
-                </div>
-                <p className="text-red-700 text-sm">{error}</p>
-              </div>
-            )}
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-5">
-
-              {/* Full Name */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">👤</span>
-                  <input name="name" type="text" placeholder="Your full name"
-                    value={form.name} onChange={handleChange} required
-                    className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl
-                               text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
-                               focus:border-transparent transition-all placeholder-gray-400" />
-                </div>
+              {/* Header */}
+              <div className="mb-6 sm:mb-7">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1.5">Create account 🚀</h2>
+                <p className="text-gray-500 text-sm">Start tracking your job hunt today — it's free!</p>
               </div>
 
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">✉️</span>
-                  <input name="email" type="email" placeholder="you@example.com"
-                    value={form.email} onChange={handleChange} required
-                    className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl
-                               text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
-                               focus:border-transparent transition-all placeholder-gray-400" />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔒</span>
-                  <input name="password" type={showPassword ? 'text' : 'password'}
-                    placeholder="Minimum 6 characters"
-                    value={form.password} onChange={handleChange} required
-                    className="w-full pl-11 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl
-                               text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
-                               focus:border-transparent transition-all placeholder-gray-400" />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">
-                    {showPassword ? '🙈' : '👁️'}
-                  </button>
-                </div>
-
-                {/* Strength meter */}
-                {form.password.length > 0 && (
-                  <div className="mt-2.5">
-                    <div className="flex gap-1 mb-1.5">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i}
-                          className={`flex-1 h-1.5 rounded-full transition-all duration-300
-                                      ${i <= strength ? strengthColor : 'bg-gray-200'}`} />
-                      ))}
-                    </div>
-                    <p className={`text-xs font-semibold
-                                   ${strength === 1 ? 'text-red-500'
-                                     : strength === 2 ? 'text-yellow-500'
-                                     : 'text-green-500'}`}>
-                      {strengthLabel} password
-                    </p>
+              {/* Error */}
+              {error && (
+                <div className="mb-5 flex items-start gap-3 bg-red-50 border border-red-200 rounded-2xl p-4">
+                  <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-white text-xs font-bold">!</span>
                   </div>
-                )}
+                  <p className="text-red-700 text-sm">{error}</p>
+                </div>
+              )}
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-5">
+
+                {/* Full Name */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">👤</span>
+                    <input name="name" type="text" placeholder="Your full name"
+                      autoComplete="name"
+                      value={form.name} onChange={handleChange} required
+                      className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl
+                                 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
+                                 focus:border-transparent transition-all placeholder-gray-400" />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">✉️</span>
+                    <input name="email" type="email" placeholder="you@example.com"
+                      autoComplete="email" inputMode="email"
+                      value={form.email} onChange={handleChange} required
+                      className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl
+                                 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
+                                 focus:border-transparent transition-all placeholder-gray-400" />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔒</span>
+                    <input name="password" type={showPassword ? 'text' : 'password'}
+                      placeholder="Minimum 6 characters" autoComplete="new-password"
+                      value={form.password} onChange={handleChange} required
+                      className="w-full pl-11 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl
+                                 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500
+                                 focus:border-transparent transition-all placeholder-gray-400" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600
+                                 w-9 h-9 flex items-center justify-center text-base">
+                      {showPassword ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+
+                  {/* Strength meter */}
+                  {form.password.length > 0 && (
+                    <div className="mt-2.5">
+                      <div className="flex gap-1 mb-1.5">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i}
+                            className={`flex-1 h-1.5 rounded-full transition-all duration-300
+                                        ${i <= strength ? strengthColor : 'bg-gray-200'}`} />
+                        ))}
+                      </div>
+                      <p className={`text-xs font-semibold
+                                     ${strength === 1 ? 'text-red-500'
+                                       : strength === 2 ? 'text-yellow-500'
+                                       : 'text-green-500'}`}>
+                        {strengthLabel} password
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Submit */}
+                <button type="submit" disabled={loading}
+                  className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white
+                             rounded-2xl font-bold text-sm hover:from-indigo-700 hover:to-purple-700
+                             transition-all disabled:opacity-60 disabled:cursor-not-allowed
+                             shadow-lg shadow-indigo-500/30 active:translate-y-0 active:scale-[0.99]">
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Creating account...
+                    </span>
+                  ) : 'Get Started Free →'}
+                </button>
+
+                <p className="text-xs text-gray-400 text-center">
+                  By registering you agree to our Terms of Service
+                </p>
+              </form>
+
+              {/* Divider */}
+              <div className="flex items-center gap-4 my-6">
+                <div className="flex-1 h-px bg-gray-200" />
+                <span className="text-xs text-gray-400 font-medium">Have an account?</span>
+                <div className="flex-1 h-px bg-gray-200" />
               </div>
 
-              {/* Submit */}
-              <button type="submit" disabled={loading}
-                className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white
-                           rounded-2xl font-bold text-sm hover:from-indigo-700 hover:to-purple-700
-                           transition-all disabled:opacity-60 disabled:cursor-not-allowed
-                           shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40
-                           hover:-translate-y-0.5 transform active:translate-y-0">
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    Creating account...
-                  </span>
-                ) : 'Get Started Free →'}
-              </button>
-
-              <p className="text-xs text-gray-400 text-center">
-                By registering you agree to our Terms of Service
-              </p>
-            </form>
-
-            {/* Divider */}
-            <div className="flex items-center gap-4 my-6">
-              <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-xs text-gray-400 font-medium">Have an account?</span>
-              <div className="flex-1 h-px bg-gray-200" />
+              <Link to="/login"
+                className="block w-full py-3.5 border-2 border-gray-200 text-gray-700 rounded-2xl
+                           font-semibold text-sm text-center hover:border-indigo-400 hover:text-indigo-600
+                           transition-all hover:bg-indigo-50 active:scale-[0.99]">
+                Sign In Instead
+              </Link>
             </div>
-
-            <Link to="/login"
-              className="block w-full py-3.5 border-2 border-gray-200 text-gray-700 rounded-2xl
-                         font-semibold text-sm text-center hover:border-indigo-400 hover:text-indigo-600
-                         transition-all hover:bg-indigo-50">
-              Sign In Instead
-            </Link>
           </div>
         </div>
       </div>
@@ -428,7 +432,7 @@ export default function RegisterPage() {
   );
 }
 
-// ── Mobile review strip: horizontal scrolling pill ────────────────────────────
+// ── Mobile review strip: single rotating testimonial pill, normal flow ────────
 function MobileReviewStrip() {
   const [idx, setIdx] = useState(0);
 
@@ -445,9 +449,9 @@ function MobileReviewStrip() {
                        flex items-center justify-center text-white font-extrabold text-xs`}>
         {r.avatar}
       </div>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-white text-xs font-semibold leading-none truncate">{r.name}</p>
-        <p className="text-white/60 text-[11px] mt-0.5 truncate line-clamp-1">{r.text.slice(0, 60)}…</p>
+        <p className="text-white/60 text-[11px] mt-0.5 truncate">{r.text.slice(0, 60)}…</p>
       </div>
       <Stars count={r.stars} />
     </div>
