@@ -1,0 +1,13 @@
+{
+  "buildCommand": "cd job-tracker-frontend && npm install && npm run build",
+  "outputDirectory": "job-tracker-frontend/dist",
+  "installCommand": "cd job-tracker-backend && npm install && cd ../job-tracker-frontend && npm install",
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
