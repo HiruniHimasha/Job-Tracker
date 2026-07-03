@@ -4,7 +4,8 @@ import axios from 'axios';
 // In dev, falls back to your local backend.
 // In production (Netlify), set VITE_API_URL in Site settings → Environment variables.
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL
+    || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api'),
 });
 
 API.interceptors.request.use((config) => {
