@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import API from '../services/api';
 import Navbar from '../components/Navbar';
 
 const getScoreColor = (score) => {
@@ -59,16 +60,15 @@ export default function ResumeAnalyzerPage() {
       formData.append('resume', file);
       if (jobDesc) formData.append('jobDescription', jobDesc);
       const token = localStorage.getItem('token');
-      const res = await axios.post(
-        'http://localhost:5000/api/resume/analyze',
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      const res = await API.post(
+  '/resume/analyze',
+  formData,
+  {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }
+);
       setAnalysis(res.data.analysis);
       setStep(1);
     } catch (err) {
