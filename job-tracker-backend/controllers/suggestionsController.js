@@ -11,12 +11,20 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_BASE    = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL              = "openrouter/auto";
 
+// Small helper to pause between requests so we don't blow past JSearch's
+// per-second rate limit (separate from the monthly quota).
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Helper: call JSearch for real job listings
 // Throws on actual API errors (auth, rate limit, etc.) so callers can tell
 // the difference between "API broke" and "genuinely zero results".
+// Retries on 429 (rate limit) after a short backoff, since a single burst of
+// parallel/rapid calls is the usual cause, not the monthly quota.
 // ─────────────────────────────────────────────────────────────────────────────
-async function searchJobs(query, { num_pages = 1, country = null } = {}) {
+async function searchJobs(query, { num_pages = 1, country = null } = {}, attempt = 1) {
   let url = `${JSEARCH_URL}?query=${encodeURIComponent(query)}&page=1&num_pages=${num_pages}`;
   if (country) url += `&country=${country}`;
 
@@ -29,6 +37,15 @@ async function searchJobs(query, { num_pages = 1, country = null } = {}) {
   });
 
   const rawText = await response.text();
+
+  if (response.status === 429 && attempt < 3) {
+    // Rate-limited (per-second cap), not necessarily out of monthly quota.
+    // Back off and retry a couple of times before giving up.
+    const backoffMs = attempt * 1000;
+    console.warn(`JSearch 429 for "${query}", retrying in ${backoffMs}ms (attempt ${attempt})`);
+    await sleep(backoffMs);
+    return searchJobs(query, { num_pages, country }, attempt + 1);
+  }
 
   if (!response.ok) {
     console.error(`JSearch API error (${response.status}) for query "${query}":`, rawText.slice(0, 300));
@@ -69,14 +86,17 @@ async function searchJobs(query, { num_pages = 1, country = null } = {}) {
 // ─────────────────────────────────────────────────────────────────────────────
 async function searchJobsWithFallback(queries, options = {}) {
   let lastError = null;
-  for (const q of queries) {
+  for (let i = 0; i < queries.length; i++) {
     try {
-      const results = await searchJobs(q, options);
+      const results = await searchJobs(queries[i], options);
       if (results.length > 0) return results;
     } catch (err) {
       lastError = err;
       // keep trying remaining fallback queries
     }
+    // Small gap between fallback attempts so we don't fire them
+    // back-to-back into JSearch's per-second rate limit.
+    if (i < queries.length - 1) await sleep(400);
   }
   if (lastError) throw lastError; // all attempts errored (not just empty)
   return []; // all attempts succeeded but genuinely returned nothing
@@ -225,10 +245,14 @@ const generateSuggestions = async (req, res) => {
     let apiErrorMessage = null;
 
     try {
-      [sriLankaJobsRaw, internationalJobsRaw] = await Promise.all([
-        searchJobsWithFallback(sriLankaQueries, { country: "lk" }).catch(err => { apiErrorMessage = err.message; return []; }),
-        searchJobsWithFallback(internationalQueries, {}).catch(err => { apiErrorMessage = err.message; return []; }),
-      ]);
+      // Sequential (not Promise.all) on purpose: running both regions in
+      // parallel doubled up requests against JSearch's per-second rate
+      // limit and was the main cause of 429s, even with quota to spare.
+      sriLankaJobsRaw = await searchJobsWithFallback(sriLankaQueries, { country: "lk" })
+        .catch(err => { apiErrorMessage = err.message; return []; });
+      await sleep(500);
+      internationalJobsRaw = await searchJobsWithFallback(internationalQueries, {})
+        .catch(err => { apiErrorMessage = err.message; return []; });
     } catch (err) {
       apiErrorMessage = err.message;
     }
