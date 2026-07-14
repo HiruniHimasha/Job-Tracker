@@ -32,3 +32,6 @@ export const analyzeJob          = (data) => API.post('/ai/analyze-job', data);
 
 // ── JOB SUGGESTIONS ──────────────────────────────────────────────────────────
 export const getJobSuggestions = (data) => API.post('/suggestions/generate', data);
+
+// Default export: the raw axios instance, for pages that call API.get/post/etc directly
+export default API;
